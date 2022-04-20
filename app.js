@@ -89,6 +89,19 @@ function init() {
 
     if (targetBone) {
       console.log({ targetBone });
+
+      const geometry = new THREE.SphereGeometry(10, 32, 16);
+      const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+      const sphere = new THREE.Mesh(geometry, material);
+
+      let tmpVector = new Vector3();
+      const p = targetBone.getWorldPosition(tmpVector);
+      console.log({ p });
+      sphere.position.x = p.x;
+      sphere.position.y = p.y;
+      sphere.position.z = p.z;
+      scene.add(sphere);
+
       setInterval(() => {
         targetBone.rotation.x = Math.random() * 3;
         render();
