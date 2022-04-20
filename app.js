@@ -55,7 +55,7 @@ function init() {
   const loader = new GLTFLoader().setPath("/");
   loader.setKTX2Loader(ktx2Loader);
   loader.setMeshoptDecoder(MeshoptDecoder);
-  loader.load("Lays_Jacket_LowPoly_A001.gltf", function (gltf) {
+  loader.load("jacket_with_bones.glb", function (gltf) {
     console.log("loaded:", gltf);
     // coffeemat.glb was produced from the source scene using gltfpack:
     // gltfpack -i coffeemat/scene.gltf -o coffeemat.glb -cc -tc
@@ -63,13 +63,20 @@ function init() {
 
     // gltf.scene.position.y = 8;
     const children = gltf.scene.children;
-    const target = children.find((c) => c.name === "High");
-    target.scale.x = 1;
-    target.scale.y = 1;
-    target.scale.z = 1;
+    console.log({ children });
+    // const target = children.find((c) => c.name === "High");
+
+    // target.children.forEach((c, index) => {
+    //   c.visible = index === 0;
+    // });
+
+    const target = gltf.scene;
+    const uniformScale = 100;
+    target.scale.x = uniformScale;
+    target.scale.y = uniformScale;
+    target.scale.z = uniformScale;
 
     console.log({ target });
-
     scene.add(target);
 
     render();
