@@ -9,11 +9,34 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { Vector3 } from "three";
+import { Object3D } from "three";
 
 let camera, scene, renderer;
 
 init();
 render();
+
+function findTargetBone(obj: Object3D, targetName: string): Object3D | null {
+  if (obj.name === targetName) {
+    console.log("found it!", obj);
+    return obj;
+  } else {
+    if (obj.children === undefined || obj.children.length === 0) {
+      return undefined;
+    }
+
+    const inMyChildren =
+      obj.children !== undefined
+        ? obj.children.find((c) => findTargetBone(c, targetName))
+        : undefined;
+    console.log({ myChildren: obj.children, inMyChildren, me: obj.name });
+    if (inMyChildren === undefined) {
+      return undefined;
+    } else {
+      return findTargetBone(inMyChildren, targetName);
+    }
+  }
+}
 
 function init() {
   const container = document.createElement("div");
@@ -76,16 +99,17 @@ function init() {
     rootObject.scale.y = uniformScale;
     rootObject.scale.z = uniformScale;
 
-    console.log({ rootObject });
+    // console.log({ rootObject });
     scene.add(rootObject);
 
-    const targetBone = rootObject.children
-      .find((c) => c.name === "Armature")
-      .children.find((c) => c.type === "SkinnedMesh")
-      .skeleton.bones.find((b) => b.name === "upper_arm_right");
-    // .children.find((c) => c.name === "trunk_right")
-    // .children.find((c) => c.name === "upper_arm_right");
-    // .children.find((c) => c.name === "lower_arm_right");
+    // const targetBone = rootObject.children
+    //   .find((c) => c.name === "Armature")
+    //   .children.find((c) => c.type === "SkinnedMesh")
+    //   .skeleton.bones.find((b) => b.name === "upper_arm_right")
+    //   .children.find((c) => c.name === "lower_arm_right");
+    // // .children.find((c) => c.name === "trunk_right")
+    // // .children.find((c) => c.name === "upper_arm_right");
+    const targetBone = findTargetBone(rootObject, "upper_arm_left");
 
     if (targetBone) {
       console.log({ targetBone });
@@ -104,6 +128,7 @@ function init() {
 
       setInterval(() => {
         targetBone.rotation.x = Math.random() * 3;
+        // targetBone.position.x += 0.5 - Math.random();
         render();
       }, 500);
     } else {
