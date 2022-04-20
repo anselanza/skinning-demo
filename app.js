@@ -70,14 +70,32 @@ function init() {
     //   c.visible = index === 0;
     // });
 
-    const target = gltf.scene;
+    const rootObject = gltf.scene;
     const uniformScale = 100;
-    target.scale.x = uniformScale;
-    target.scale.y = uniformScale;
-    target.scale.z = uniformScale;
+    rootObject.scale.x = uniformScale;
+    rootObject.scale.y = uniformScale;
+    rootObject.scale.z = uniformScale;
 
-    console.log({ target });
-    scene.add(target);
+    console.log({ rootObject });
+    scene.add(rootObject);
+
+    const targetBone = rootObject.children
+      .find((c) => c.name === "Armature")
+      .children.find((c) => c.type === "SkinnedMesh")
+      .skeleton.bones.find((b) => b.name === "upper_arm_right");
+    // .children.find((c) => c.name === "trunk_right")
+    // .children.find((c) => c.name === "upper_arm_right");
+    // .children.find((c) => c.name === "lower_arm_right");
+
+    if (targetBone) {
+      console.log({ targetBone });
+      setInterval(() => {
+        targetBone.rotation.x = Math.random() * 3;
+        render();
+      }, 500);
+    } else {
+      console.error("couldn't find targetBone");
+    }
 
     render();
   });
