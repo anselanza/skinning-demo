@@ -2,7 +2,6 @@ import "@tensorflow/tfjs-backend-webgl";
 import * as mpPose from "@mediapipe/pose";
 import * as posedetection from "@tensorflow-models/pose-detection";
 
-import "./style.scss";
 import { SupportedModels } from "@tensorflow-models/pose-detection";
 
 async function createDetector() {
