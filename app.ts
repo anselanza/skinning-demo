@@ -89,8 +89,8 @@ function init() {
     scene.updateWorldMatrix();
 
     const [targetBoneA, targetBoneB] = [
-      findTargetBone(rootObject, "mixamorig9Spine2"),
-      findTargetBone(rootObject, "mixamorig9Neck"),
+      findTargetBone(rootObject, "mixamorig9LeftArm"),
+      findTargetBone(rootObject, "mixamorig9LeftForeArm"),
     ];
 
     if (targetBoneA && targetBoneB) {
@@ -125,14 +125,14 @@ function init() {
           position: {
             x: worldPositionB.x,
             y: worldPositionB.y,
-            z: worldPositionB.z - 0.1,
+            z: worldPositionB.z - 0.01,
           },
         },
         {
           name: "tailPositionB", // NEW wrist join position
           colour: 0x00ff00, //green
           position: {
-            x: worldPositionB.x,
+            x: worldPositionB.x + 0.1,
             y: worldPositionB.y - 0.1,
             z: worldPositionB.z - 0.2,
           },
