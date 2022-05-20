@@ -8,7 +8,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
-import { Vector3, Object3D, Material, Bone } from "three";
+import { Vector3, Object3D, Material, Bone, Quaternion, Matrix4 } from "three";
 
 let camera, scene, renderer;
 
@@ -89,8 +89,8 @@ function init() {
     scene.updateWorldMatrix();
 
     const [targetBoneA, targetBoneB] = [
-      findTargetBone(rootObject, "mixamorig9LeftArm"),
-      findTargetBone(rootObject, "mixamorig9LeftForeArm"),
+      findTargetBone(rootObject, "mixamorig9Spine2"),
+      findTargetBone(rootObject, "mixamorig9Neck"),
     ];
 
     if (targetBoneA && targetBoneB) {
@@ -120,20 +120,20 @@ function init() {
           },
         },
         {
-          name: "tailPositionA", // ORIGINAL wrist join position
+          name: "tailPositionA", // near-ORIGINAL wrist join position
           colour: 0xff0000, // red
           position: {
             x: worldPositionB.x,
             y: worldPositionB.y,
-            z: worldPositionB.z,
+            z: worldPositionB.z - 0.1,
           },
         },
         {
           name: "tailPositionB", // NEW wrist join position
           colour: 0x00ff00, //green
           position: {
-            x: worldPositionB.x + 0.1,
-            y: worldPositionB.y + 0.2,
+            x: worldPositionB.x,
+            y: worldPositionB.y - 0.1,
             z: worldPositionB.z - 0.2,
           },
         },
@@ -158,13 +158,19 @@ function init() {
       setInterval(() => {
         index++;
         if (index % 2 === 0) {
-          // const targetSphere = targets.find((t) => t.name === "tailPositionA");
-          // const { x, y, z } = targetSphere.position;
-          // boneLookAtWorld(targetBoneA, new Vector3(x, y, z));
-        } else {
           const targetSphere = targets.find((t) => t.name === "tailPositionB");
           const { x, y, z } = targetSphere.position;
-          boneLookAtWorld(targetBoneA, new Vector3(x, y, z));
+          boneLookAtWorld(targetBoneA as Bone, new Vector3(x, y, z));
+
+          // const targetSphere = targets.find((t) => t.name === "tailPositionA");
+          // const { x, y, z } = targetSphere.position;
+          // boneLookAtWorld(targetBoneA as Bone, new Vector3(x, y, z));
+        } else {
+          const targetSphere = targets.find((t) => t.name === "tailPositionA");
+          const { x, y, z } = targetSphere.position;
+          boneLookAtWorld(targetBoneA as Bone, new Vector3(x, y, z));
+
+          // boneLookAtWorld(targetBoneA, camera.position.clone());
         }
 
         render();
@@ -201,22 +207,26 @@ function render() {
   renderer.render(scene, camera);
 }
 
-function boneLookAtLocal(bone: Bone, position: Vector3) {
-  // // bone.updateMatrixWorld(); // no effect!
-  let direction = position.clone().normalize();
-  let pitch = Math.asin(-direction.y); // + bone.offset
-  let yaw = Math.atan2(direction.x, direction.z); //Beware cos(pitch)==0, catch this exception!
-  let roll = Math.PI;
-  bone.rotation.set(roll, yaw, pitch);
-  // bone.lookAt(position);
-}
+function boneLookAtWorld(bone: Bone, position: Vector3) {
+  bone.updateWorldMatrix(true, false); // parents, not children
+  const tempPosition = new Vector3();
+  tempPosition.setFromMatrixPosition(bone.matrixWorld);
 
-function boneLookAtWorld(bone, v) {
+  const tmpMatrix = new Matrix4();
+  tmpMatrix.lookAt(position, tempPosition, new Vector3(0, 1, 0));
+
+  const rotateN = new Matrix4().makeRotationX((90 * Math.PI) / 180);
+  tmpMatrix.multiply(rotateN);
+
+  bone.quaternion.setFromRotationMatrix(tmpMatrix);
+
   const parent = bone.parent;
-  scene.attach(bone);
-  // bone.applyQuaternion(parent.quaternion);
-  boneLookAtLocal(bone, v);
+  if (parent) {
+    tmpMatrix.extractRotation(parent.matrixWorld);
+    const tmpQuat = new Quaternion();
+    tmpQuat.setFromRotationMatrix(tmpMatrix);
+    bone.quaternion.premultiply(tmpQuat.invert());
+  }
 
-  // bone.lookAt(v);
-  parent.attach(bone);
+  // bone.lookAt(position);
 }
