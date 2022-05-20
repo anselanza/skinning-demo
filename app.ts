@@ -50,10 +50,10 @@ function init() {
   container.appendChild(renderer.domElement);
 
   camera = new THREE.PerspectiveCamera(
-    45,
+    30,
     window.innerWidth / window.innerHeight
   );
-  camera.position.set(0, 1, -5);
+  camera.position.set(-5, 1, -2);
 
   const environment = new RoomEnvironment();
   const pmremGenerator = new THREE.PMREMGenerator(renderer);
@@ -120,7 +120,7 @@ function init() {
         },
         {
           name: "tailPositionA", // ORIGINAL wrist join position
-          colour: 0xff0000,
+          colour: 0xff0000, // red
           position: {
             x: worldPositionB.x,
             y: worldPositionB.y,
@@ -129,7 +129,7 @@ function init() {
         },
         {
           name: "tailPositionB", // NEW wrist join position
-          colour: 0x00ff00,
+          colour: 0x00ff00, //green
           position: {
             x: worldPositionB.x + 0.1,
             y: worldPositionB.y + 0.2,
@@ -157,37 +157,13 @@ function init() {
       setInterval(() => {
         index++;
         if (index % 2 === 0) {
-          // targetBoneA.rotateX(Math.random() * 1);
-          // targetBoneA.lookAt(new Vector3());
-
-          // targetBoneA.lookAt(0, 0, 0);
-
           const targetSphere = targets.find((t) => t.name === "tailPositionA");
           const { x, y, z } = targetSphere.position;
-
-          targetBoneA.lookAt(new Vector3(x, y, z));
-
-          // boneLookAtLocal(targetBoneA as Bone, new Vector3(0, 0, 0));
+          boneLookAtWorld(targetBoneA, new Vector3(x, y, z));
         } else {
           const targetSphere = targets.find((t) => t.name === "tailPositionB");
           const { x, y, z } = targetSphere.position;
-          // boneLookAtLocal(targetBoneA as Bone, new Vector3(x, y, z));
-          const parent = targetBoneA.parent;
-          // parent.remove(targetBoneA);
-          // scene.attach(targetBoneA);
-          // console.log({ parent });
-          // targetBoneA.updateMatrixWorld();
-          // console.log("parent quat", parent.quaternion);
-
-          const parentDirection = parent.getWorldDirection(new Vector3());
-          const myDirection = targetBoneA.getWorldDirection(new Vector3());
-          // console.log({ parentDirection, myDirection });
-
-          targetBoneA.lookAt(new Vector3(x, y, z));
-
-          // targetBoneA.applyQuaternion(parent.quaternion);
-
-          // parent.attach(targetBoneA);
+          boneLookAtWorld(targetBoneA, new Vector3(x, y, z));
         }
 
         render();
@@ -224,18 +200,20 @@ function render() {
   renderer.render(scene, camera);
 }
 
-// function boneLookAtLocal(bone: Bone, position: Vector3) {
-//   bone.updateMatrixWorld();
-//   let direction = position.clone().normalize();
-//   let pitch = Math.asin(-direction.y); // + bone.offset
-//   let yaw = Math.atan2(direction.x, direction.z); //Beware cos(pitch)==0, catch this exception!
-//   let roll = Math.PI;
-//   bone.rotation.set(roll, yaw, pitch);
-// }
+function boneLookAtLocal(bone: Bone, position: Vector3) {
+  bone.updateMatrixWorld();
+  let direction = position.clone().normalize();
+  let pitch = Math.asin(-direction.y); // + bone.offset
+  let yaw = Math.atan2(direction.x, direction.z); //Beware cos(pitch)==0, catch this exception!
+  let roll = Math.PI;
+  bone.rotation.set(roll, yaw, pitch);
+}
 
-// function boneLookAtWorld(bone, v) {
-//   const parent = bone.parent;
-//   scene.attach(bone);
-//   boneLookAtLocal(bone, v);
-//   parent.attach(bone);
-// }
+function boneLookAtWorld(bone, v) {
+  const parent = bone.parent;
+  scene.attach(bone);
+  boneLookAtLocal(bone, v);
+
+  // bone.lookAt(v);
+  parent.attach(bone);
+}
