@@ -50,10 +50,11 @@ function init() {
   container.appendChild(renderer.domElement);
 
   camera = new THREE.PerspectiveCamera(
-    30,
-    window.innerWidth / window.innerHeight
+    45,
+    window.innerWidth / window.innerHeight,
+    0.01
   );
-  camera.position.set(-5, 1, -2);
+  camera.position.set(-2, 3, -1);
 
   const environment = new RoomEnvironment();
   const pmremGenerator = new THREE.PMREMGenerator(renderer);
@@ -75,7 +76,7 @@ function init() {
   const loader = new GLTFLoader().setPath("/");
   loader.setKTX2Loader(ktx2Loader);
   loader.setMeshoptDecoder(MeshoptDecoder);
-  loader.load("jacket_with_bones.glb", function (gltf) {
+  loader.load("from-mixamo.glb", function (gltf) {
     console.log("loaded:", gltf);
 
     // const children = gltf.scene.children;
@@ -88,8 +89,8 @@ function init() {
     scene.updateWorldMatrix();
 
     const [targetBoneA, targetBoneB] = [
-      findTargetBone(rootObject, "left_elbow-left_wrist"),
-      findTargetBone(rootObject, "left_wrist"),
+      findTargetBone(rootObject, "mixamorig9LeftArm"),
+      findTargetBone(rootObject, "mixamorig9LeftForeArm"),
     ];
 
     if (targetBoneA && targetBoneB) {
@@ -157,9 +158,9 @@ function init() {
       setInterval(() => {
         index++;
         if (index % 2 === 0) {
-          const targetSphere = targets.find((t) => t.name === "tailPositionA");
-          const { x, y, z } = targetSphere.position;
-          boneLookAtWorld(targetBoneA, new Vector3(x, y, z));
+          // const targetSphere = targets.find((t) => t.name === "tailPositionA");
+          // const { x, y, z } = targetSphere.position;
+          // boneLookAtWorld(targetBoneA, new Vector3(x, y, z));
         } else {
           const targetSphere = targets.find((t) => t.name === "tailPositionB");
           const { x, y, z } = targetSphere.position;
@@ -201,17 +202,19 @@ function render() {
 }
 
 function boneLookAtLocal(bone: Bone, position: Vector3) {
-  bone.updateMatrixWorld();
+  // // bone.updateMatrixWorld(); // no effect!
   let direction = position.clone().normalize();
   let pitch = Math.asin(-direction.y); // + bone.offset
   let yaw = Math.atan2(direction.x, direction.z); //Beware cos(pitch)==0, catch this exception!
   let roll = Math.PI;
   bone.rotation.set(roll, yaw, pitch);
+  // bone.lookAt(position);
 }
 
 function boneLookAtWorld(bone, v) {
   const parent = bone.parent;
   scene.attach(bone);
+  // bone.applyQuaternion(parent.quaternion);
   boneLookAtLocal(bone, v);
 
   // bone.lookAt(v);
