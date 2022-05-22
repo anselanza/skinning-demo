@@ -34,9 +34,9 @@ function findTargetBone(obj: Object3D, targetName: string): Object3D | null {
   }
 }
 
-export function init() {
+export function init(rootElement: HTMLElement) {
   const container = document.createElement("div");
-  document.body.appendChild(container);
+  rootElement.appendChild(container);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(window.devicePixelRatio);

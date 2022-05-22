@@ -1,14 +1,14 @@
 import { loadSystem } from "./PoseDetection";
 import { init, render } from "./Render3D";
 
-const main = async () => {
-  loadSystem();
+const main = async (rootElement: HTMLElement) => {
+  loadSystem(rootElement);
 };
 
-const detectionElement = document.getElementsByClassName;
-if (detectionElement) {
+const rootElement = document.getElementsByClassName("app")[0] as HTMLElement;
+if (rootElement) {
   console.log("DOM ready");
-  main();
+  main(rootElement);
 } else {
   console.error("could not find app element");
 }

@@ -3,6 +3,7 @@ import * as mpPose from "@mediapipe/pose";
 import * as posedetection from "@tensorflow-models/pose-detection";
 
 import { SupportedModels } from "@tensorflow-models/pose-detection";
+import { init } from "./Render3D";
 
 async function createDetector() {
   return posedetection.createDetector(SupportedModels.BlazePose, {
@@ -19,6 +20,16 @@ export async function loadSystem(rootElement: HTMLElement) {
 
     const detector = await createDetector();
     console.info("detector loaded OK, wait for start");
+
+    const imageEl = document.getElementById("dummy-input") as HTMLImageElement;
+
+    // Single pose detection on provided image:
+    const poses = await detector.estimatePoses(imageEl, {
+      flipHorizontal: false,
+    });
+    console.log("found", poses.length, "poses");
+
+    init(rootElement);
   } catch (e) {
     console.error("Error starting system:", e);
   }
