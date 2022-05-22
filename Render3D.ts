@@ -11,6 +11,8 @@ import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.j
 import { Vector3, Object3D, Material, Bone, Quaternion, Matrix4 } from "three";
 import { Keypoint, Pose } from "@tensorflow-models/pose-detection";
 
+import { mapping } from "./JointsToBones";
+
 let camera, scene, renderer;
 
 function findTargetBone(obj: Object3D, targetName: string): Object3D | null {
@@ -82,7 +84,9 @@ export const init = async (rootElement: HTMLElement): Promise<THREE.Group> =>
       const rootObject = gltf.scene;
       scene.add(rootObject);
 
-      rootObject.rotateY((180 * Math.PI) / 180);
+      // rootObject.rotateY((180 * Math.PI) / 180);
+      const scale = 0.9;
+      rootObject.scale.set(-scale, scale, -scale);
       scene.updateWorldMatrix();
 
       render();
@@ -116,7 +120,7 @@ export function render() {
 
 const normalisePoint = (kp: Keypoint): Vector3 => {
   const { x, y, z } = kp;
-  return new Vector3(x, -y + 0.8, z);
+  return new Vector3(x, -y + 0.9, z);
 };
 
 export function drawPoseJoints(pose: Pose, rootElement: THREE.Group) {
@@ -135,12 +139,12 @@ export function drawPoseJoints(pose: Pose, rootElement: THREE.Group) {
 }
 
 export function bonesMatchPose(pose: Pose, rootElement: THREE.Group) {
-  const targetBoneName = "mixamorig9LeftArm";
+  mapping.forEach((m) => {
+    const targetBoneName = m.bone;
 
-  const [jointHead, jointTail] = ["left_shoulder", "left_elbow"];
-  console.log({ pose });
+    const [jointHead, jointTail] = m.jointHeadTail;
+    console.log({ pose });
 
-  if (rootElement) {
     const targetBone = rootElement.getObjectByName(targetBoneName) as Bone;
     if (targetBone) {
       console.log("found", { targetBone });
@@ -165,9 +169,7 @@ export function bonesMatchPose(pose: Pose, rootElement: THREE.Group) {
     } else {
       console.error("could not find bone with name", targetBoneName);
     }
-  } else {
-    console.error("scene not ready");
-  }
+  });
 }
 
 function boneLookAtWorld(bone: Bone, position: Vector3) {
