@@ -3,7 +3,7 @@ import * as mpPose from "@mediapipe/pose";
 import * as posedetection from "@tensorflow-models/pose-detection";
 
 import { SupportedModels } from "@tensorflow-models/pose-detection";
-import { init } from "./Render3D";
+import { bonesMatchPose, drawPoseJoints, init } from "./Render3D";
 
 async function createDetector() {
   return posedetection.createDetector(SupportedModels.BlazePose, {
@@ -29,7 +29,12 @@ export async function loadSystem(rootElement: HTMLElement) {
     });
     console.log("found", poses.length, "poses");
 
-    init(rootElement);
+    const rootObject = await init(rootElement);
+
+    poses.forEach((p) => {
+      drawPoseJoints(p, rootObject);
+      bonesMatchPose(p, rootObject);
+    });
   } catch (e) {
     console.error("Error starting system:", e);
   }
