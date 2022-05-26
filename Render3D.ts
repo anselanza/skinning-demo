@@ -84,7 +84,7 @@ export const init = async (rootElement: HTMLElement): Promise<THREE.Group> =>
       const rootObject = gltf.scene;
       scene.add(rootObject);
 
-      // rootObject.rotateY((180 * Math.PI) / 180);
+      rootObject.rotateY((180 * Math.PI) / 180);
       const scale = 0.9;
       rootObject.scale.set(-scale, scale, -scale);
       scene.updateWorldMatrix();
@@ -138,32 +138,56 @@ export function drawPoseJoints(pose: Pose, rootElement: THREE.Group) {
   });
 }
 
+const singleOrInterpolatedJoint = (
+  matchingJoint: string | [string, string],
+  pose: Pose
+): Keypoint => {
+  if (typeof matchingJoint === "string") {
+    // Simple match on single corresponding joint...
+    return pose.keypoints3D.find((kp) => kp.name === matchingJoint);
+  } else {
+    // Need to interpolate between the two keypoints given...
+    const [p1, p2] = [
+      pose.keypoints3D.find((kp) => kp.name === matchingJoint[0]),
+      pose.keypoints3D.find((kp) => kp.name === matchingJoint[1]),
+    ];
+    const midpoint = new Vector3().lerpVectors(
+      new Vector3(p1.x, p1.y, p1.z),
+      new Vector3(p2.x, p2.y, p2.z),
+      0.5
+    );
+    return {
+      x: midpoint.x,
+      y: midpoint.y,
+      z: midpoint.z,
+      name: `${p1.name}_${p2.name}`,
+      score: (p1.score + p2.score) / 2, // average of scores
+    };
+  }
+};
+
 export function bonesMatchPose(pose: Pose, rootElement: THREE.Group) {
   mapping.forEach((m) => {
     const targetBoneName = m.bone;
 
-    const [jointHead, jointTail] = m.jointHeadTail;
+    const [matchingJointHead, matchingJointTail] = m.jointHeadTail;
     console.log({ pose });
 
     const targetBone = rootElement.getObjectByName(targetBoneName) as Bone;
     if (targetBone) {
       console.log("found", { targetBone });
 
-      const srcJointHead = pose.keypoints3D.find((kp) => kp.name === jointHead);
-      const srcJointTail = pose.keypoints3D.find((kp) => kp.name === jointTail);
+      const jointHead = singleOrInterpolatedJoint(matchingJointHead, pose);
+      const jointTail = singleOrInterpolatedJoint(matchingJointTail, pose);
 
-      if (srcJointHead && srcJointTail) {
-        console.log(
-          "found matching bone from joins",
-          srcJointHead,
-          srcJointTail
-        );
-        boneLookAtWorld(targetBone, normalisePoint(srcJointTail));
+      if (jointHead && jointTail) {
+        console.log("found matching bone from joins", jointHead, jointTail);
+        pointBoneAtPosition(targetBone, normalisePoint(jointTail));
       } else {
         console.error(
           "could not find joint in pose with ends",
-          srcJointHead,
-          srcJointTail
+          jointHead,
+          jointTail
         );
       }
     } else {
@@ -172,7 +196,7 @@ export function bonesMatchPose(pose: Pose, rootElement: THREE.Group) {
   });
 }
 
-function boneLookAtWorld(bone: Bone, position: Vector3) {
+function pointBoneAtPosition(bone: Bone, position: Vector3) {
   bone.updateWorldMatrix(true, false); // parents, not children
   const tempPosition = new Vector3();
   tempPosition.setFromMatrixPosition(bone.matrixWorld);

@@ -1,7 +1,10 @@
 interface J2BMap {
-  jointHeadTail: [string, string];
+  jointHeadTail: [string, string] | [[string, string], [string, string]];
   bone: string;
 }
+
+// See MediaPipe Blazepose 3d joint schema:
+// https://google.github.io/mediapipe/solutions/pose.html#pose-landmark-model-blazepose-ghum-3d
 
 export const mapping: J2BMap[] = [
   // Left arm
@@ -43,4 +46,11 @@ export const mapping: J2BMap[] = [
     jointHeadTail: ["right_knee", "right_ankle"],
     bone: "mixamorig9RightLeg",
   },
+
+  // Spine,
+  // interpolated from midpoint hips to midpoint shoulders
+  // {
+  //   jointHeadTail: [],
+  //   bone: "mixamorig9:Spine2",
+  // },
 ];
