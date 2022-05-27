@@ -6,6 +6,9 @@ interface J2BMap {
 // See MediaPipe Blazepose 3d joint schema:
 // https://google.github.io/mediapipe/solutions/pose.html#pose-landmark-model-blazepose-ghum-3d
 
+// Notes:
+// - All bone names must have : symbols removed in this map
+
 export const mapping: J2BMap[] = [
   // Left arm
   {
@@ -49,8 +52,11 @@ export const mapping: J2BMap[] = [
 
   // Spine,
   // interpolated from midpoint hips to midpoint shoulders
-  // {
-  //   jointHeadTail: [],
-  //   bone: "mixamorig9:Spine2",
-  // },
+  {
+    jointHeadTail: [
+      ["left_hip", "right_hip"],
+      ["left_shoulder", "right_shoulder"],
+    ],
+    bone: "mixamorig9Spine2",
+  },
 ];

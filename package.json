@@ -13,15 +13,16 @@
   "devDependencies": {
     "@types/three": "^0.140.0",
     "sass": "^1.50.0",
-    "vite": "^2.9.5",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.4",
+    "vite": "^2.9.5"
   },
   "dependencies": {
-    "three": "^0.139.2",
+    "@anselan/maprange": "^0.9.0",
     "@mediapipe/pose": "~0.4.0",
     "@tensorflow-models/pose-detection": "^2.0.0",
     "@tensorflow/tfjs-backend-webgl": "^3.8.0",
     "@tensorflow/tfjs-converter": "^3.8.0",
-    "@tensorflow/tfjs-core": "^3.8.0"
+    "@tensorflow/tfjs-core": "^3.8.0",
+    "three": "^0.139.2"
   }
 }

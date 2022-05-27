@@ -12,6 +12,7 @@ import { Vector3, Object3D, Material, Bone, Quaternion, Matrix4 } from "three";
 import { Keypoint, Pose } from "@tensorflow-models/pose-detection";
 
 import { mapping } from "./JointsToBones";
+import { remap } from "@anselan/maprange";
 
 let camera, scene, renderer;
 
@@ -84,9 +85,10 @@ export const init = async (rootElement: HTMLElement): Promise<THREE.Group> =>
       const rootObject = gltf.scene;
       scene.add(rootObject);
 
-      rootObject.rotateY((180 * Math.PI) / 180);
-      const scale = 0.9;
-      rootObject.scale.set(-scale, scale, -scale);
+      // rootObject.rotateY((180 * Math.PI) / 180);
+      // rootObject.rotateX((-90 * Math.PI) / 180);
+      const scale = 0.95;
+      rootObject.scale.set(scale, scale, scale);
       scene.updateWorldMatrix();
 
       render();
@@ -118,18 +120,23 @@ export function render() {
   renderer.render(scene, camera);
 }
 
-const normalisePoint = (kp: Keypoint): Vector3 => {
+const normalisePoint = (
+  kp: Keypoint,
+  flipX = false,
+  flipY = false
+): Vector3 => {
   const { x, y, z } = kp;
-  return new Vector3(x, -y + 0.9, z);
+  return new Vector3(flipX ? -x : x, -y + 0.9, flipY ? -z : z);
 };
 
 export function drawPoseJoints(pose: Pose, rootElement: THREE.Group) {
   pose.keypoints3D.forEach((kp) => {
-    const geometry = new THREE.SphereGeometry(0.05, 32, 16);
+    const radius = remap(kp.score, [0, 1], [0, 0.05]);
+    const geometry = new THREE.SphereGeometry(radius, 32, 16);
     const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     const sphere = new THREE.Mesh(geometry, material);
 
-    const { x, y, z } = normalisePoint(kp);
+    const { x, y, z } = normalisePoint(kp, true);
 
     sphere.position.x = x;
     sphere.position.y = y;
@@ -175,14 +182,18 @@ export function bonesMatchPose(pose: Pose, rootElement: THREE.Group) {
 
     const targetBone = rootElement.getObjectByName(targetBoneName) as Bone;
     if (targetBone) {
+      if (targetBone.name === "mixamorig9Spine2") {
+        console.log("have spine; rotate 90 deg");
+        targetBone.rotateY((90 * Math.PI) / 180);
+      }
       console.log("found", { targetBone });
 
       const jointHead = singleOrInterpolatedJoint(matchingJointHead, pose);
       const jointTail = singleOrInterpolatedJoint(matchingJointTail, pose);
 
       if (jointHead && jointTail) {
-        console.log("found matching bone from joins", jointHead, jointTail);
-        pointBoneAtPosition(targetBone, normalisePoint(jointTail));
+        console.log("found matching bone from joints", jointHead, jointTail);
+        pointBoneAtPosition(targetBone, normalisePoint(jointTail, false, true));
       } else {
         console.error(
           "could not find joint in pose with ends",
@@ -196,7 +207,17 @@ export function bonesMatchPose(pose: Pose, rootElement: THREE.Group) {
   });
 }
 
-function pointBoneAtPosition(bone: Bone, position: Vector3) {
+function moveBoneHeadToPosition(bone: Bone, position: Vector3) {
+  const localPosition = bone.worldToLocal(position);
+  bone.position.set(localPosition.x, localPosition.y, localPosition.z);
+  // bone.position.set(position.x, position.y, position.z);
+}
+
+function pointBoneAtPosition(
+  bone: Bone,
+  position: Vector3,
+  correctRotation?: number
+) {
   bone.updateWorldMatrix(true, false); // parents, not children
   const tempPosition = new Vector3();
   tempPosition.setFromMatrixPosition(bone.matrixWorld);
@@ -207,13 +228,25 @@ function pointBoneAtPosition(bone: Bone, position: Vector3) {
   const rotateN = new Matrix4().makeRotationX((90 * Math.PI) / 180);
   tmpMatrix.multiply(rotateN);
 
+  if (correctRotation) {
+    const rotateFix = new Matrix4().makeRotationY(
+      (correctRotation * Math.PI) / 180
+    );
+    tmpMatrix.multiply(rotateFix);
+  }
+
   bone.quaternion.setFromRotationMatrix(tmpMatrix);
 
   const parent = bone.parent;
   if (parent) {
     tmpMatrix.extractRotation(parent.matrixWorld);
+
+    // const rotateN2 = new Matrix4().makeRotationY((180 * Math.PI) / 180);
+    // tmpMatrix.multiply(rotateN2);
+
     const tmpQuat = new Quaternion();
     tmpQuat.setFromRotationMatrix(tmpMatrix);
+
     bone.quaternion.premultiply(tmpQuat.invert());
   }
 
