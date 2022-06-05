@@ -14,11 +14,14 @@ import { Keypoint, Pose } from "@tensorflow-models/pose-detection";
 import { mappingCustomBlender } from "./JointsToBones";
 import { remap } from "@anselan/maprange";
 
-let camera, renderer;
+let camera: THREE.Camera;
+let renderer: THREE.WebGLRenderer;
 let scene: THREE.Scene;
 
+let rootModel: THREE.Object3D;
+
 const transformSettings = {
-  rotateModel: true,
+  rotateModel: false,
   normalisePoints: {
     flipX: true,
     flipZ: false,
@@ -75,6 +78,8 @@ export const init = async (
       const rootObject = gltf.scene;
       scene.add(rootObject);
 
+      rootModel = rootObject.children[0];
+
       if (transformSettings.rotateModel === true) {
         rootObject.rotateY((180 * Math.PI) / 180);
         rootObject.updateWorldMatrix(true, true);
@@ -95,21 +100,31 @@ export const init = async (
     controls.target.set(0, 0, 0);
     controls.update();
 
-    window.addEventListener("resize", onWindowResize);
+    // window.addEventListener("resize", onWindowResize);
   });
 
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
+// function onWindowResize() {
+//   camera.aspect = window.innerWidth / window.innerHeight;
+//   camera.updateProjectionMatrix();
 
-  renderer.setSize(window.innerWidth, window.innerHeight);
+//   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  // render();
-}
+//   // render();
+// }
 
 //
 
-export function render() {
+export function render(targetScreenPosition: { x: number; y: number }) {
+  const { x, y } = targetScreenPosition;
+  const [width, height] = [window.innerWidth, window.innerHeight];
+
+  const [remapX, remapY] = [
+    remap(x, [0, width], [-3, 3]),
+    remap(y, [0, height], [-2, 2]),
+  ];
+
+  // rootModel.position.set(remapX, 0, 0);
+
   renderer.render(scene, camera);
 }
 
@@ -171,15 +186,15 @@ export function bonesMatchPose(pose: Pose, rootElement: THREE.Group) {
     const targetBoneName = m.bone;
 
     const [matchingJointHead, matchingJointTail] = m.jointHeadTail;
-    console.log({ pose });
+    // console.log({ pose });
 
     const targetBone = rootElement.getObjectByName(targetBoneName) as Bone;
     if (targetBone) {
       if (targetBone.name === "mixamorig9Spine2") {
-        console.log("have spine; rotate 90 deg");
+        // console.log("have spine; rotate 90 deg");
         // targetBone.rotateY((90 * Math.PI) / 180);
       }
-      console.log("found", { targetBone });
+      // console.log("found", { targetBone });
 
       const jointHead = singleOrInterpolatedJoint(matchingJointHead, pose);
       const jointTail = singleOrInterpolatedJoint(matchingJointTail, pose);
