@@ -128,7 +128,7 @@ const normalisePoint = (
   flipY = false
 ): Vector3 => {
   const { x, y, z } = kp;
-  return new Vector3(flipX ? -x : x, -y + 0.25, flipY ? -z : z);
+  return new Vector3(flipX ? -x : x, -y + 0.2, flipY ? -z : z);
 };
 
 export function drawPoseJoints(pose: Pose, rootElement: THREE.Group) {
