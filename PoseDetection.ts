@@ -3,7 +3,7 @@ import * as mpPose from "@mediapipe/pose";
 import * as posedetection from "@tensorflow-models/pose-detection";
 
 import { SupportedModels } from "@tensorflow-models/pose-detection";
-import { bonesMatchPose, drawPoseJoints, init } from "./Render3D";
+import { bonesMatchPose, drawPoseJoints, init, render } from "./Render3D";
 
 async function createDetector() {
   return posedetection.createDetector(SupportedModels.BlazePose, {
@@ -25,18 +25,20 @@ export async function loadSystem(rootElement: HTMLElement) {
       "dummy-input"
     ) as HTMLVideoElement;
 
-    // Single pose detection on provided image:
-    const poses = await detector.estimatePoses(inputElement, {
-      flipHorizontal: false,
-    });
-    console.log("found", poses.length, "poses");
-
     const { rootObject, scene } = await init(rootElement);
 
-    poses.forEach((p) => {
-      drawPoseJoints(p, scene);
-      bonesMatchPose(p, rootObject);
-    });
+    const tick = async (_time: number) => {
+      const poses = await detector.estimatePoses(inputElement, {
+        flipHorizontal: false,
+      });
+      poses.forEach((p) => {
+        // drawPoseJoints(p, scene);
+        bonesMatchPose(p, rootObject);
+        render();
+      });
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
   } catch (e) {
     console.error("Error starting system:", e);
   }

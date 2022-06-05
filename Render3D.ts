@@ -14,33 +14,21 @@ import { Keypoint, Pose } from "@tensorflow-models/pose-detection";
 import { mappingCustomBlender } from "./JointsToBones";
 import { remap } from "@anselan/maprange";
 
-let camera, scene, renderer;
+let camera, renderer;
+let scene: THREE.Scene;
 
-function findTargetBone(obj: Object3D, targetName: string): Object3D | null {
-  if (obj.name === targetName) {
-    console.log("found it!", obj);
-    return obj;
-  } else {
-    if (obj.children === undefined || obj.children.length === 0) {
-      return undefined;
-    }
-
-    const inMyChildren =
-      obj.children !== undefined
-        ? obj.children.find((c) => findTargetBone(c, targetName))
-        : undefined;
-    console.log({ myChildren: obj.children, inMyChildren, me: obj.name });
-    if (inMyChildren === undefined) {
-      return undefined;
-    } else {
-      return findTargetBone(inMyChildren, targetName);
-    }
-  }
-}
+const transformSettings = {
+  rotateModel: true,
+  normalisePoints: {
+    flipX: true,
+    flipZ: false,
+  },
+  postCorrectRotation: 180,
+};
 
 export const init = async (
   rootElement: HTMLElement
-): Promise<{ rootObject: THREE.Group; scene: THREE.Group }> =>
+): Promise<{ rootObject: THREE.Group; scene: THREE.Scene }> =>
   new Promise((resolve, reject) => {
     const container = document.createElement("div");
     rootElement.appendChild(container);
@@ -58,7 +46,7 @@ export const init = async (
       window.innerWidth / window.innerHeight,
       0.01
     );
-    camera.position.set(-2, 3, -1);
+    camera.position.set(0, 0, -5);
 
     const environment = new RoomEnvironment();
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
@@ -87,18 +75,21 @@ export const init = async (
       const rootObject = gltf.scene;
       scene.add(rootObject);
 
-      // rootObject.rotateY((180 * Math.PI) / 180);
+      if (transformSettings.rotateModel === true) {
+        rootObject.rotateY((180 * Math.PI) / 180);
+        rootObject.updateWorldMatrix(true, true);
+      }
       // rootObject.rotateX((-90 * Math.PI) / 180);
       const scale = 0.95;
       rootObject.scale.set(scale, scale, scale);
-      scene.updateWorldMatrix();
+      scene.updateWorldMatrix(false, true);
 
-      render();
+      // render();
       resolve({ rootObject, scene });
     });
 
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.addEventListener("change", render); // use if there is no animation loop
+    // controls.addEventListener("change", render); // use if there is no animation loop
     controls.minDistance = 1;
     controls.maxDistance = 20;
     controls.target.set(0, 0, 0);
@@ -113,7 +104,7 @@ function onWindowResize() {
 
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  render();
+  // render();
 }
 
 //
@@ -125,10 +116,10 @@ export function render() {
 const normalisePoint = (
   kp: Keypoint,
   flipX = false,
-  flipY = false
+  flipZ = false
 ): Vector3 => {
   const { x, y, z } = kp;
-  return new Vector3(flipX ? -x : x, -y + 0.2, flipY ? -z : z);
+  return new Vector3(flipX ? -x : x, -y + 0.2, flipZ ? -z : z);
 };
 
 export function drawPoseJoints(pose: Pose, rootElement: THREE.Group) {
@@ -194,8 +185,13 @@ export function bonesMatchPose(pose: Pose, rootElement: THREE.Group) {
       const jointTail = singleOrInterpolatedJoint(matchingJointTail, pose);
 
       if (jointHead && jointTail) {
-        console.log("found matching bone from joints", jointHead, jointTail);
-        pointBoneAtPosition(targetBone, normalisePoint(jointTail, false, true));
+        // console.log("found matching bone from joints", jointHead, jointTail);
+        const { flipX, flipZ } = transformSettings.normalisePoints;
+        pointBoneAtPosition(
+          targetBone,
+          normalisePoint(jointTail, flipX, flipZ),
+          transformSettings.postCorrectRotation
+        );
       } else {
         console.error(
           "could not find joint in pose with ends",
