@@ -45,7 +45,7 @@ export const init = async (
     const container = document.createElement("div");
     rootElement.appendChild(container);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -64,11 +64,11 @@ export const init = async (
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xbbbbbb);
+    // scene.background = new THREE.Color(0xbbbbbb);
     scene.environment = pmremGenerator.fromScene(environment).texture;
 
     const grid = new THREE.GridHelper(10, 20, 0xffffff, 0xffffff);
-    (grid.material as Material).opacity = 0.5;
+    (grid.material as Material).opacity = 0.25;
     (grid.material as Material).depthWrite = false;
     (grid.material as Material).transparent = true;
     scene.add(grid);
@@ -209,12 +209,6 @@ export function bonesMatchPose(pose: Pose, rootElement: THREE.Group) {
   });
   // Finally, rotate the whole model 180 degrees again
   rootElement.rotateY((180 * Math.PI) / 180);
-}
-
-function moveBoneHeadToPosition(bone: Bone, position: Vector3) {
-  const localPosition = bone.worldToLocal(position);
-  bone.position.set(localPosition.x, localPosition.y, localPosition.z);
-  // bone.position.set(position.x, position.y, position.z);
 }
 
 function pointBoneAtPosition(

@@ -4,15 +4,15 @@ body {
 }
 
 .app {
-  img#dummy-input {
-    width: 30vw;
-    z-index: 2;
+  #dummy-input {
+    width: 100vw;
+    z-index: 1;
     position: absolute;
   }
   canvas {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 1;
+    z-index: 2;
   }
 }

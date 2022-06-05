@@ -21,10 +21,12 @@ export async function loadSystem(rootElement: HTMLElement) {
     const detector = await createDetector();
     console.info("detector loaded OK, wait for start");
 
-    const imageEl = document.getElementById("dummy-input") as HTMLImageElement;
+    const inputElement = document.getElementById(
+      "dummy-input"
+    ) as HTMLVideoElement;
 
     // Single pose detection on provided image:
-    const poses = await detector.estimatePoses(imageEl, {
+    const poses = await detector.estimatePoses(inputElement, {
       flipHorizontal: false,
     });
     console.log("found", poses.length, "poses");
