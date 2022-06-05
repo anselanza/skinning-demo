@@ -9,7 +9,7 @@ interface J2BMap {
 // Notes:
 // - All bone names must have : symbols removed in this map
 
-export const mapping: J2BMap[] = [
+export const mappingMixamo: J2BMap[] = [
   // Left arm
   {
     jointHeadTail: ["left_shoulder", "left_elbow"],
@@ -58,5 +58,45 @@ export const mapping: J2BMap[] = [
       ["left_shoulder", "right_shoulder"],
     ],
     bone: "mixamorig9Spine2",
+  },
+];
+
+export const mappingCustomBlender: J2BMap[] = [
+  // Left arm
+  {
+    jointHeadTail: ["left_shoulder", "left_elbow"],
+    bone: "left_upper_arm",
+  },
+  {
+    jointHeadTail: ["left_elbow", "left_wrist"],
+    bone: "left_lower_arm",
+  },
+
+  // Right arm
+  {
+    jointHeadTail: ["right_shoulder", "right_elbow"],
+    bone: "right_upper_arm",
+  },
+  {
+    jointHeadTail: ["right_elbow", "right_wrist"],
+    bone: "right_lower_arm",
+  },
+
+  // Spine,
+  // interpolated from midpoint hips to midpoint shoulders
+  {
+    jointHeadTail: [
+      ["left_hip", "right_hip"],
+      ["left_shoulder", "right_shoulder"],
+    ],
+    bone: "spine",
+  },
+
+  {
+    jointHeadTail: [
+      ["right_shoulder", "left_shoulder"],
+      ["mouth_right", "mouth_left"],
+    ],
+    bone: "neck",
   },
 ];

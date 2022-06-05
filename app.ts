@@ -1,5 +1,4 @@
 import { loadSystem } from "./PoseDetection";
-import { init, render } from "./Render3D";
 
 const main = async (rootElement: HTMLElement) => {
   loadSystem(rootElement);

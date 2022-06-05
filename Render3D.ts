@@ -11,7 +11,7 @@ import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.j
 import { Vector3, Object3D, Material, Bone, Quaternion, Matrix4 } from "three";
 import { Keypoint, Pose } from "@tensorflow-models/pose-detection";
 
-import { mapping } from "./JointsToBones";
+import { mappingCustomBlender } from "./JointsToBones";
 import { remap } from "@anselan/maprange";
 
 let camera, scene, renderer;
@@ -38,7 +38,9 @@ function findTargetBone(obj: Object3D, targetName: string): Object3D | null {
   }
 }
 
-export const init = async (rootElement: HTMLElement): Promise<THREE.Group> =>
+export const init = async (
+  rootElement: HTMLElement
+): Promise<{ rootObject: THREE.Group; scene: THREE.Group }> =>
   new Promise((resolve, reject) => {
     const container = document.createElement("div");
     rootElement.appendChild(container);
@@ -79,7 +81,7 @@ export const init = async (rootElement: HTMLElement): Promise<THREE.Group> =>
     loader.setKTX2Loader(ktx2Loader);
     loader.setMeshoptDecoder(MeshoptDecoder);
 
-    loader.load("from-mixamo.glb", function (gltf) {
+    loader.load("smooth-lowpoly.glb", function (gltf) {
       console.log("loaded:", gltf);
 
       const rootObject = gltf.scene;
@@ -92,7 +94,7 @@ export const init = async (rootElement: HTMLElement): Promise<THREE.Group> =>
       scene.updateWorldMatrix();
 
       render();
-      resolve(rootObject);
+      resolve({ rootObject, scene });
     });
 
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -126,7 +128,7 @@ const normalisePoint = (
   flipY = false
 ): Vector3 => {
   const { x, y, z } = kp;
-  return new Vector3(flipX ? -x : x, -y + 0.9, flipY ? -z : z);
+  return new Vector3(flipX ? -x : x, -y + 0.25, flipY ? -z : z);
 };
 
 export function drawPoseJoints(pose: Pose, rootElement: THREE.Group) {
@@ -174,7 +176,7 @@ const singleOrInterpolatedJoint = (
 };
 
 export function bonesMatchPose(pose: Pose, rootElement: THREE.Group) {
-  mapping.forEach((m) => {
+  mappingCustomBlender.forEach((m) => {
     const targetBoneName = m.bone;
 
     const [matchingJointHead, matchingJointTail] = m.jointHeadTail;
@@ -184,7 +186,7 @@ export function bonesMatchPose(pose: Pose, rootElement: THREE.Group) {
     if (targetBone) {
       if (targetBone.name === "mixamorig9Spine2") {
         console.log("have spine; rotate 90 deg");
-        targetBone.rotateY((90 * Math.PI) / 180);
+        // targetBone.rotateY((90 * Math.PI) / 180);
       }
       console.log("found", { targetBone });
 
@@ -205,6 +207,8 @@ export function bonesMatchPose(pose: Pose, rootElement: THREE.Group) {
       console.error("could not find bone with name", targetBoneName);
     }
   });
+  // Finally, rotate the whole model 180 degrees again
+  rootElement.rotateY((180 * Math.PI) / 180);
 }
 
 function moveBoneHeadToPosition(bone: Bone, position: Vector3) {

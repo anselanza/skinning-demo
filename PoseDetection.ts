@@ -29,10 +29,10 @@ export async function loadSystem(rootElement: HTMLElement) {
     });
     console.log("found", poses.length, "poses");
 
-    const rootObject = await init(rootElement);
+    const { rootObject, scene } = await init(rootElement);
 
     poses.forEach((p) => {
-      drawPoseJoints(p, rootObject);
+      drawPoseJoints(p, scene);
       bonesMatchPose(p, rootObject);
     });
   } catch (e) {
