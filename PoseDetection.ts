@@ -31,13 +31,20 @@ export async function loadSystem(rootElement: HTMLElement) {
       const poses = await detector.estimatePoses(inputElement, {
         flipHorizontal: false,
       });
+
       poses.forEach((p) => {
         // drawPoseJoints(p, scene);
         bonesMatchPose(p, rootObject);
 
+        // const normKeypoints =
+        //   posedetection.calculators.keypointsToNormalizedKeypoints(
+        //     p.keypoints,
+        //     inputElement
+        //   );
+
         const [width, height] = [
-          inputElement.clientWidth,
-          inputElement.clientHeight,
+          inputElement.videoWidth,
+          inputElement.videoHeight,
         ];
 
         const target = p.keypoints.find((k) => k.name === "nose");

@@ -48,12 +48,12 @@ export const init = async (
     containerElement.classList.add("render-container");
 
     camera = new THREE.PerspectiveCamera(
-      45,
+      10,
       window.innerWidth / window.innerHeight,
       0.01
     );
-    camera.position.set(0, 1.8, -2);
-    camera.lookAt(0, 1, 0);
+    camera.position.set(0, 2.5, -6);
+    camera.lookAt(0, 0.75, 0);
 
     const environment = new RoomEnvironment();
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
