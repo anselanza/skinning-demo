@@ -35,9 +35,14 @@ export async function loadSystem(rootElement: HTMLElement) {
         // drawPoseJoints(p, scene);
         bonesMatchPose(p, rootObject);
 
-        const target = p.keypoints.find((k) => k.name === "left_hip");
+        const [width, height] = [
+          inputElement.clientWidth,
+          inputElement.clientHeight,
+        ];
+
+        const target = p.keypoints.find((k) => k.name === "nose");
         if (target) {
-          render({ x: target.x, y: target.y });
+          render({ x: target.x, y: target.y }, { width, height });
         }
       });
       requestAnimationFrame(tick);

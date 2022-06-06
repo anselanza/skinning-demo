@@ -9,10 +9,13 @@ body {
     z-index: 1;
     position: absolute;
   }
-  canvas {
+  .render-container {
     position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 2;
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+    }
   }
 }

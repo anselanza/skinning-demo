@@ -3,7 +3,7 @@
 import * as THREE from "three";
 
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
@@ -13,12 +13,14 @@ import { Keypoint, Pose } from "@tensorflow-models/pose-detection";
 
 import { mappingCustomBlender } from "./JointsToBones";
 import { remap } from "@anselan/maprange";
+import { IDimensions, IPosition } from "./types";
 
 let camera: THREE.Camera;
 let renderer: THREE.WebGLRenderer;
 let scene: THREE.Scene;
 
 let rootModel: THREE.Object3D;
+let containerElement: HTMLDivElement;
 
 const transformSettings = {
   rotateModel: false,
@@ -33,8 +35,8 @@ export const init = async (
   rootElement: HTMLElement
 ): Promise<{ rootObject: THREE.Group; scene: THREE.Scene }> =>
   new Promise((resolve, reject) => {
-    const container = document.createElement("div");
-    rootElement.appendChild(container);
+    containerElement = document.createElement("div");
+    rootElement.appendChild(containerElement);
 
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -42,14 +44,16 @@ export const init = async (
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1;
     renderer.outputEncoding = THREE.sRGBEncoding;
-    container.appendChild(renderer.domElement);
+    containerElement.appendChild(renderer.domElement);
+    containerElement.classList.add("render-container");
 
     camera = new THREE.PerspectiveCamera(
       45,
       window.innerWidth / window.innerHeight,
       0.01
     );
-    camera.position.set(0, 0, -5);
+    camera.position.set(0, 1.8, -2);
+    camera.lookAt(0, 1, 0);
 
     const environment = new RoomEnvironment();
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
@@ -93,12 +97,12 @@ export const init = async (
       resolve({ rootObject, scene });
     });
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    // controls.addEventListener("change", render); // use if there is no animation loop
-    controls.minDistance = 1;
-    controls.maxDistance = 20;
-    controls.target.set(0, 0, 0);
-    controls.update();
+    // const controls = new OrbitControls(camera, renderer.domElement);
+    // // controls.addEventListener("change", render); // use if there is no animation loop
+    // controls.minDistance = 1;
+    // controls.maxDistance = 20;
+    // controls.target.set(0, 0, 0);
+    // controls.update();
 
     // window.addEventListener("resize", onWindowResize);
   });
@@ -114,16 +118,23 @@ export const init = async (
 
 //
 
-export function render(targetScreenPosition: { x: number; y: number }) {
+export function render(
+  targetScreenPosition: IPosition,
+  inputDimensions: IDimensions
+) {
   const { x, y } = targetScreenPosition;
-  const [width, height] = [window.innerWidth, window.innerHeight];
+  const { width, height } = inputDimensions;
+  const [outputWidth, outputHeight] = [window.innerWidth, window.innerHeight];
 
-  const [remapX, remapY] = [
-    remap(x, [0, width], [-3, 3]),
-    remap(y, [0, height], [-2, 2]),
+  const [ratioWidth, ratioHeight] = [
+    outputWidth / width,
+    outputHeight / height,
   ];
 
-  // rootModel.position.set(remapX, 0, 0);
+  if (containerElement) {
+    containerElement.style.left = `${(x - width / 2) * ratioWidth}px`;
+    containerElement.style.top = `${(y - height / 2) * ratioHeight}px`;
+  }
 
   renderer.render(scene, camera);
 }
