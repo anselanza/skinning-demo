@@ -5,12 +5,14 @@ import * as posedetection from "@tensorflow-models/pose-detection";
 import { SupportedModels } from "@tensorflow-models/pose-detection";
 import { bonesMatchPose, drawPoseJoints, init, render } from "./Render3D";
 
+const version = mpPose.VERSION || "0.4.1633558788";
+
 async function createDetector() {
   return posedetection.createDetector(SupportedModels.BlazePose, {
     runtime: "mediapipe",
     // modelType: posedetection.movenet.modelType.MULTIPOSE_LIGHTNING,
     // modelType: "heavy",
-    solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${mpPose.VERSION}`,
+    solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${version}`,
   });
 }
 
