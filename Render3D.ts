@@ -87,7 +87,7 @@ export const init = async (
     loader.setKTX2Loader(ktx2Loader);
     loader.setMeshoptDecoder(MeshoptDecoder);
 
-    loader.load("smooth-lowpoly.glb", function (gltf) {
+    loader.load("./smooth-lowpoly.glb", function (gltf) {
       console.log("loaded:", gltf);
 
       const rootObject = gltf.scene;

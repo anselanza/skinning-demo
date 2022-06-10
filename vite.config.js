@@ -6,7 +6,7 @@ export default {
   build: {
     outDir: "docs",
   },
-  base: "https://anselanza.github.io/skinning-demo/",
+  base: "./",
   plugins: [
     mediapipe_workaround(),
     // copy({
