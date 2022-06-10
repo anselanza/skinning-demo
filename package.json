@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "serve": "npx serve dist"
   },
   "author": "",
   "license": "ISC",
@@ -24,6 +25,7 @@
     "@tensorflow/tfjs-backend-webgl": "^3.8.0",
     "@tensorflow/tfjs-converter": "^3.8.0",
     "@tensorflow/tfjs-core": "^3.8.0",
+    "serve": "^13.0.2",
     "three": "^0.139.2"
   }
 }

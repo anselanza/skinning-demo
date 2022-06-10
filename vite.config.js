@@ -3,10 +3,6 @@ import fs from "fs";
 // import copy from "rollup-plugin-copy";
 
 export default {
-  build: {
-    outDir: "docs",
-  },
-  base: "./",
   plugins: [
     mediapipe_workaround(),
     // copy({
