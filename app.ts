@@ -1,4 +1,5 @@
 import { loadSystem } from "./PoseDetection";
+import "./app.scss";
 
 const main = async (rootElement: HTMLElement) => {
   const videoElement = document.getElementById(
