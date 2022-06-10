@@ -29,6 +29,16 @@ const transformSettings = {
     flipZ: false,
   },
   postCorrectRotation: 180,
+  camera: {
+    cameraFovRange: [8, 1],
+    position: new Vector3(0, 3, -6),
+    target: new Vector3(0, 0.8, 0),
+  },
+  render: {
+    // Aim at a point much higher vertically (give space)
+    // < 0.5 means more space below
+    verticalRatio: 0.25,
+  },
 };
 
 export const init = async (
@@ -52,8 +62,9 @@ export const init = async (
       window.innerWidth / window.innerHeight,
       0.01
     );
-    camera.position.set(0, 3, -6);
-    camera.lookAt(0, 0.5, 0);
+    const { position, target } = transformSettings.camera;
+    camera.position.set(position.x, position.y, position.z);
+    camera.lookAt(target.x, target.y, target.z);
 
     const environment = new RoomEnvironment();
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
@@ -135,12 +146,17 @@ export function render(
   if (containerElement) {
     // Nose exactly halfway across the canvas horizontally...
     containerElement.style.left = `${(x - width / 2) * ratioWidth}px`;
-    // Aim at a point much higher vertically (give space)
-    containerElement.style.top = `${(y - height * 0.15) * ratioHeight}px`;
+    containerElement.style.top = `${
+      (y - height * transformSettings.render.verticalRatio) * ratioHeight
+    }px`;
   }
 
   // Zoom camera to try to match scale
-  const scaleFov = remap(bodySize * ratioHeight, [0, outputHeight], [2, 15]);
+  const scaleFov = remap(
+    bodySize * ratioHeight,
+    [0, outputHeight],
+    transformSettings.camera.cameraFovRange
+  );
   camera.fov = scaleFov;
   camera.updateProjectionMatrix();
 

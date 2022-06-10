@@ -14,16 +14,15 @@ async function createDetector() {
   });
 }
 
-export async function loadSystem(rootElement: HTMLElement) {
+export async function loadSystem(
+  rootElement: HTMLElement,
+  inputElement: HTMLVideoElement
+) {
   try {
     // const skinnedPose = new SkinnedPose(rootElement);
 
     const detector = await createDetector();
     console.info("detector loaded OK, wait for start");
-
-    const inputElement = document.getElementById(
-      "dummy-input"
-    ) as HTMLVideoElement;
 
     const { rootObject, scene } = await init(rootElement);
 
