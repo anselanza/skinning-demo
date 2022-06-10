@@ -9,7 +9,7 @@ async function createDetector() {
   return posedetection.createDetector(SupportedModels.BlazePose, {
     runtime: "mediapipe",
     // modelType: posedetection.movenet.modelType.MULTIPOSE_LIGHTNING,
-
+    // modelType: "heavy",
     solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${mpPose.VERSION}`,
   });
 }
@@ -48,8 +48,15 @@ export async function loadSystem(rootElement: HTMLElement) {
         ];
 
         const target = p.keypoints.find((k) => k.name === "nose");
+
+        const [size1, size2] = [
+          p.keypoints.find((k) => k.name === "left_shoulder"),
+          p.keypoints.find((k) => k.name === "left_hip"),
+        ];
+        const bodySize = Math.abs(size1.y - size2.y);
+
         if (target) {
-          render({ x: target.x, y: target.y }, { width, height });
+          render({ x: target.x, y: target.y }, { width, height }, bodySize);
         }
       });
       requestAnimationFrame(tick);

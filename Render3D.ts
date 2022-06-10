@@ -15,7 +15,7 @@ import { mappingCustomBlender } from "./JointsToBones";
 import { remap } from "@anselan/maprange";
 import { IDimensions, IPosition } from "./types";
 
-let camera: THREE.Camera;
+let camera: THREE.PerspectiveCamera;
 let renderer: THREE.WebGLRenderer;
 let scene: THREE.Scene;
 
@@ -52,8 +52,8 @@ export const init = async (
       window.innerWidth / window.innerHeight,
       0.01
     );
-    camera.position.set(0, 2.5, -6);
-    camera.lookAt(0, 0.75, 0);
+    camera.position.set(0, 3, -6);
+    camera.lookAt(0, 0.5, 0);
 
     const environment = new RoomEnvironment();
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
@@ -62,11 +62,11 @@ export const init = async (
     // scene.background = new THREE.Color(0xbbbbbb);
     scene.environment = pmremGenerator.fromScene(environment).texture;
 
-    const grid = new THREE.GridHelper(10, 20, 0xffffff, 0xffffff);
-    (grid.material as Material).opacity = 0.25;
-    (grid.material as Material).depthWrite = false;
-    (grid.material as Material).transparent = true;
-    scene.add(grid);
+    // const grid = new THREE.GridHelper(10, 20, 0xffffff, 0xffffff);
+    // (grid.material as Material).opacity = 0.25;
+    // (grid.material as Material).depthWrite = false;
+    // (grid.material as Material).transparent = true;
+    // scene.add(grid);
 
     const ktx2Loader = new KTX2Loader()
       .setTranscoderPath("js/libs/basis/")
@@ -89,7 +89,7 @@ export const init = async (
         rootObject.updateWorldMatrix(true, true);
       }
       // rootObject.rotateX((-90 * Math.PI) / 180);
-      const scale = 0.95;
+      const scale = 0.9;
       rootObject.scale.set(scale, scale, scale);
       scene.updateWorldMatrix(false, true);
 
@@ -120,7 +120,8 @@ export const init = async (
 
 export function render(
   targetScreenPosition: IPosition,
-  inputDimensions: IDimensions
+  inputDimensions: IDimensions,
+  bodySize: number
 ) {
   const { x, y } = targetScreenPosition;
   const { width, height } = inputDimensions;
@@ -132,9 +133,16 @@ export function render(
   ];
 
   if (containerElement) {
+    // Nose exactly halfway across the canvas horizontally...
     containerElement.style.left = `${(x - width / 2) * ratioWidth}px`;
-    containerElement.style.top = `${(y - height / 2) * ratioHeight}px`;
+    // Aim at a point much higher vertically (give space)
+    containerElement.style.top = `${(y - height * 0.15) * ratioHeight}px`;
   }
+
+  // Zoom camera to try to match scale
+  const scaleFov = remap(bodySize * ratioHeight, [0, outputHeight], [2, 15]);
+  camera.fov = scaleFov;
+  camera.updateProjectionMatrix();
 
   renderer.render(scene, camera);
 }
