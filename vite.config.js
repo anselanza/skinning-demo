@@ -1,27 +1,27 @@
 import path from "path";
 import fs from "fs";
-import copy from "rollup-plugin-copy";
+// import copy from "rollup-plugin-copy";
 
 export default {
   plugins: [
     mediapipe_workaround(),
-    copy({
-      targets: [
-        {
-          src: [
-            "./node_modules/@mediapipe/pose/*.wasm",
-            "./node_modules/@mediapipe/pose/*.tflite",
-            "./node_modules/@mediapipe/pose/*.binarypb",
-            "./node_modules/@mediapipe/pose/*wasm_bin.js",
-            "../../node_modules/@mediapipe/pose/*.wasm",
-            "../../node_modules/@mediapipe/pose/*.tflite",
-            "../../node_modules/@mediapipe/pose/*.binarypb",
-            "../../node_modules/@mediapipe/pose/*wasm_bin.js",
-          ],
-          dest: "dist/",
-        },
-      ],
-    }),
+    // copy({
+    //   targets: [
+    //     {
+    //       src: [
+    //         "./node_modules/@mediapipe/pose/*.wasm",
+    //         "./node_modules/@mediapipe/pose/*.tflite",
+    //         "./node_modules/@mediapipe/pose/*.binarypb",
+    //         "./node_modules/@mediapipe/pose/*wasm_bin.js",
+    //         "../../node_modules/@mediapipe/pose/*.wasm",
+    //         "../../node_modules/@mediapipe/pose/*.tflite",
+    //         "../../node_modules/@mediapipe/pose/*.binarypb",
+    //         "../../node_modules/@mediapipe/pose/*wasm_bin.js",
+    //       ],
+    //       dest: "dist/",
+    //     },
+    //   ],
+    // }),
   ],
 };
 
