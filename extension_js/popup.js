@@ -7,33 +7,48 @@ startButton.addEventListener("click", async () => {
 
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-  chrome.desktopCapture.chooseDesktopMedia(["window"], tab, (streamId) => {
+  chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    function: startCapture,
+  });
+
+  chrome.desktopCapture.chooseDesktopMedia(["tab"], tab, async (streamId) => {
     console.log("started desktopCapture OK", streamId);
     //check whether the user canceled the request or not
     if (streamId && streamId.length) {
     }
 
-    const outputVideoEl = document.getElementById("inputSource");
-    if (outputVideoEl) {
-      try {
-        outputVideoEl.srcObject = streamId;
-        console.log("video stream assigned OK", streamId);
-      } catch (e) {
-        console.error("Assign stream error:", e);
-      }
-    } else {
-      console.error("outputElement missing!");
-    }
-  });
+    chrome.tabs.sendMessage(tab.id, { streamId }, function (response) {
+      // console.log(response.farewell);
+    });
 
-  // chrome.scripting.executeScript({
-  //   target: { tabId: tab.id },
-  //   function: startCapture,
-  // });
+    // const outputVideoEl = document.getElementById("inputSource");
+    // if (outputVideoEl) {
+    //   try {
+    //     outputVideoEl.srcObject = streamId;
+    //     console.log("video stream assigned OK", streamId);
+    //   } catch (e) {
+    //     console.error("Assign stream error:", e);
+    //   }
+    // } else {
+    //   console.error("outputElement missing!");
+    // }
+  });
 });
 
 // The body of this function will be executed as a content script inside the
 // current page
 function startCapture() {
   console.log("startCapture");
+  // await navigator.mediaDevices.getUserMedia({
+  //   video: {
+  //     mandatory: {
+  //       chromeMediaSource: "desktop",
+  //       chromeMediaSourceId: streamId,
+  //     },
+  //   },
+  // });
+  chrome.runtime.onMessage.addListener((message) => {
+    console.log("got message!", message);
+  });
 }

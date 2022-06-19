@@ -1,9 +1,9 @@
 #inputSource {
-  width: 640px;
+  width: 128px;
   height: auto;
-  position: absolute;
+  /* position: absolute; */
   top: 0;
   left: 0;
-  visibility: hidden;
+  /* visibility: hidden; */
   touch-action: none;
 }
