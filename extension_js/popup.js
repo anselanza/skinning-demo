@@ -40,15 +40,22 @@ startButton.addEventListener("click", async () => {
 // current page
 function startCapture() {
   console.log("startCapture");
-  // await navigator.mediaDevices.getUserMedia({
-  //   video: {
-  //     mandatory: {
-  //       chromeMediaSource: "desktop",
-  //       chromeMediaSourceId: streamId,
-  //     },
-  //   },
-  // });
-  chrome.runtime.onMessage.addListener((message) => {
+  chrome.runtime.onMessage.addListener(async (message) => {
     console.log("got message!", message);
+    const { streamId } = message;
+
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          mandatory: {
+            chromeMediaSource: "desktop",
+            chromeMediaSourceId: streamId,
+          },
+        },
+      });
+      console.log("got stream OK:", mediaStream);
+    } catch (e) {
+      console.error("error getting stream:", e);
+    }
   });
 }
