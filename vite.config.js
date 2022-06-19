@@ -3,6 +3,8 @@ import fs from "fs";
 // import copy from "rollup-plugin-copy";
 
 export default {
+  root: "typescript",
+
   plugins: [
     mediapipe_workaround(),
     // copy({
