@@ -8,9 +8,21 @@ startButton.addEventListener("click", async () => {
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
   chrome.desktopCapture.chooseDesktopMedia(["window"], tab, (streamId) => {
-    console.log("started desktopCapture OK");
+    console.log("started desktopCapture OK", streamId);
     //check whether the user canceled the request or not
     if (streamId && streamId.length) {
+    }
+
+    const outputVideoEl = document.getElementById("inputSource");
+    if (outputVideoEl) {
+      try {
+        outputVideoEl.srcObject = streamId;
+        console.log("video stream assigned OK", streamId);
+      } catch (e) {
+        console.error("Assign stream error:", e);
+      }
+    } else {
+      console.error("outputElement missing!");
     }
   });
 
