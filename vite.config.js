@@ -1,8 +1,19 @@
 import path from "path";
 import fs from "fs";
+const { resolve } = require("path");
 // import copy from "rollup-plugin-copy";
 
 export default {
+  build: {
+    rollupOptions: {
+      input: {
+        demo: resolve(__dirname, "typescript/index.html"),
+        popup: resolve(__dirname, "typescript/popup.html"),
+      },
+    },
+  },
+  root: "typescript",
+
   plugins: [
     mediapipe_workaround(),
     // copy({
