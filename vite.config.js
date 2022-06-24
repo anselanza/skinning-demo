@@ -4,15 +4,14 @@ const { resolve } = require("path");
 // import copy from "rollup-plugin-copy";
 
 export default {
+  base: "./",
   build: {
-    rollupOptions: {
-      input: {
-        demo: resolve(__dirname, "typescript/index.html"),
-        popup: resolve(__dirname, "typescript/popup.html"),
-      },
+    lib: {
+      entry: path.resolve(__dirname, "popup.html"),
+      name: "BodyExtension",
+      fileName: (format) => `extension.${format}.js`,
     },
   },
-  root: "typescript",
 
   plugins: [
     mediapipe_workaround(),
