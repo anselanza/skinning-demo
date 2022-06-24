@@ -37,7 +37,7 @@ startButton.addEventListener("click", async () => {
 });
 
 // The body of this function will be executed as a content script inside the
-// current page
+// current page. OUTPUT WILL BE IN THE CURRENT PAGE (not the popup inspector)!
 function startCapture() {
   console.log("startCapture");
   chrome.runtime.onMessage.addListener(async (message) => {
