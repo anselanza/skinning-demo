@@ -4,7 +4,7 @@
   "version": "1.0",
   "manifest_version": 3,
   "action": {
-    "default_popup": "extension_js/popup.html",
+    "default_popup": "typescript/dist/popup.html",
     "default_icon": {
       "16": "extension_js/images/get_started16.png",
       "32": "extension_js/images/get_started32.png",
