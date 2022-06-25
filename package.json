@@ -2,7 +2,6 @@
   "name": "body-extension",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -27,5 +26,16 @@
     "@tensorflow/tfjs-core": "^3.8.0",
     "serve": "^13.0.2",
     "three": "^0.139.2"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/body-extension.umd.js",
+  "module": "./dist/body-extension.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/body-extension.es.js",
+      "require": "./dist/body-extension.umd.js"
+    }
   }
 }

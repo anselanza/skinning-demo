@@ -1,14 +1,16 @@
 import path from "path";
 import fs from "fs";
-const { resolve } = require("path");
 // import copy from "rollup-plugin-copy";
 
 export default {
   base: "./",
   build: {
+    minify: false,
+    sourcemap: true,
     lib: {
       entry: path.resolve(__dirname, "popup.html"),
       name: "BodyExtension",
+      formats: ["iife"],
     },
   },
 

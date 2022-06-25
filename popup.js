@@ -73,7 +73,7 @@ function startCapture() {
       console.log("...DOM appending done");
 
       try {
-        loadSystem(outputContainer, videoElement);
+        await loadSystem(outputContainer, videoElement);
       } catch (poseSystemError) {
         console.error("error starting pose detection system:", poseSystemError);
       }
