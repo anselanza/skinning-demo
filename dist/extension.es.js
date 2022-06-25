@@ -54666,17 +54666,23 @@ function startCapture() {
         }
       });
       console.log("got stream OK:", mediaStream);
-      const body = document.body;
+      const outputContainer = document.createElement("div");
+      outputContainer.style.position = "fixed";
+      outputContainer.style.top = 0;
+      outputContainer.style.left = 0;
+      outputContainer.style.border = "1px solid red";
       const videoElement = document.createElement("video");
       videoElement.srcObject = mediaStream;
       videoElement.autoplay = true;
-      videoElement.style.position = "absolute";
+      videoElement.style.position = "position";
       videoElement.style.top = 0;
       videoElement.style.left = 0;
       videoElement.style.visibility = "hidden";
-      videoElement.setAttribute("data-html2canvas-ignore", "true");
-      body.appendChild(videoElement);
-      console.log("appended video element", videoElement);
+      outputContainer.setAttribute("data-html2canvas-ignore", "true");
+      outputContainer.appendChild(videoElement);
+      console.log("append DOM elements", { videoElement, outputContainer });
+      document.body.appendChild(outputContainer);
+      console.log("...DOM appending done");
     } catch (e) {
       console.error("error getting stream:", e);
     }

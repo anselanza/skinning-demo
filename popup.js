@@ -61,20 +61,35 @@ function startCapture() {
       });
       console.log("got stream OK:", mediaStream);
 
-      const body = document.body;
+      const outputContainer = document.createElement("div");
+      // Object.assign(outputContainer.style, {
+      //   position: "fixed",
+      //   top: 0,
+      //   left: 0,
+      //   width: "100vw",
+      //   height: "100vh",
+      //   border: "1px solid red",
+      // });
+      outputContainer.style.position = "fixed";
+      outputContainer.style.top = 0;
+      outputContainer.style.left = 0;
+      outputContainer.style.border = "1px solid red";
+
       const videoElement = document.createElement("video");
       videoElement.srcObject = mediaStream;
       videoElement.autoplay = true;
-      videoElement.style.position = "fixed";
+      videoElement.style.position = "position";
       videoElement.style.top = 0;
       videoElement.style.left = 0;
       videoElement.style.visibility = "hidden";
-      videoElement.setAttribute("data-html2canvas-ignore", "true");
 
-      // videoElement.style.
-      body.appendChild(videoElement);
+      outputContainer.setAttribute("data-html2canvas-ignore", "true");
 
-      console.log("appended video element", videoElement);
+      outputContainer.appendChild(videoElement);
+      console.log("append DOM elements", { videoElement, outputContainer });
+      document.body.appendChild(outputContainer);
+
+      console.log("...DOM appending done");
     } catch (e) {
       console.error("error getting stream:", e);
     }
