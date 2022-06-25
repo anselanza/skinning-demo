@@ -18,6 +18,7 @@ startButton.addEventListener("click", async () => {
     console.log("started desktopCapture OK", streamId);
     //check whether the user canceled the request or not
     if (streamId && streamId.length) {
+      console.warn("user cancelled request?");
     }
 
     setTimeout(() => {
@@ -27,18 +28,6 @@ startButton.addEventListener("click", async () => {
         console.log({ response });
       });
     }, 1000);
-
-    // const outputVideoEl = document.getElementById("inputSource");
-    // if (outputVideoEl) {
-    //   try {
-    //     outputVideoEl.srcObject = streamId;
-    //     console.log("video stream assigned OK", streamId);
-    //   } catch (e) {
-    //     console.error("Assign stream error:", e);
-    //   }
-    // } else {
-    //   console.error("outputElement missing!");
-    // }
   });
 });
 
@@ -62,14 +51,6 @@ function startCapture() {
       console.log("got stream OK:", mediaStream);
 
       const outputContainer = document.createElement("div");
-      // Object.assign(outputContainer.style, {
-      //   position: "fixed",
-      //   top: 0,
-      //   left: 0,
-      //   width: "100vw",
-      //   height: "100vh",
-      //   border: "1px solid red",
-      // });
       outputContainer.style.position = "fixed";
       outputContainer.style.top = 0;
       outputContainer.style.left = 0;
@@ -90,8 +71,14 @@ function startCapture() {
       document.body.appendChild(outputContainer);
 
       console.log("...DOM appending done");
-    } catch (e) {
-      console.error("error getting stream:", e);
+
+      try {
+        loadSystem(outputContainer, videoElement);
+      } catch (poseSystemError) {
+        console.error("error starting pose detection system:", poseSystemError);
+      }
+    } catch (streamError) {
+      console.error("error getting stream:", streamError);
     }
   });
 }

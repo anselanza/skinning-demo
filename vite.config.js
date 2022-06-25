@@ -9,30 +9,10 @@ export default {
     lib: {
       entry: path.resolve(__dirname, "popup.html"),
       name: "BodyExtension",
-      fileName: (format) => `extension.${format}.js`,
     },
   },
 
-  plugins: [
-    mediapipe_workaround(),
-    // copy({
-    //   targets: [
-    //     {
-    //       src: [
-    //         "./node_modules/@mediapipe/pose/*.wasm",
-    //         "./node_modules/@mediapipe/pose/*.tflite",
-    //         "./node_modules/@mediapipe/pose/*.binarypb",
-    //         "./node_modules/@mediapipe/pose/*wasm_bin.js",
-    //         "../../node_modules/@mediapipe/pose/*.wasm",
-    //         "../../node_modules/@mediapipe/pose/*.tflite",
-    //         "../../node_modules/@mediapipe/pose/*.binarypb",
-    //         "../../node_modules/@mediapipe/pose/*wasm_bin.js",
-    //       ],
-    //       dest: "dist/",
-    //     },
-    //   ],
-    // }),
-  ],
+  plugins: [mediapipe_workaround()],
 };
 
 // https://github.com/google/mediapipe/issues/2883 が本家で対応されるまでのワークアラウンド
