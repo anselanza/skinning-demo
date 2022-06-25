@@ -3,9 +3,7 @@ import { loadSystem } from "./PoseDetection";
 // Initialize button with user's preferred color
 const startButton = document.getElementById("startButton");
 
-// THIS IS THE KEY: https://stackoverflow.com/questions/29056607/in-chrome-extensions-is-it-possible-to-screencapture-and-display-the-screen-on
-// Using a Blob URL to stream the video from the Content Script context (which has access to the page/DOM)
-// to the Popup context (which has access to the scripts and libraries needed for pose detection and 3D rendering)
+// The key to doing this properly is: https://github.com/wpp/ScreenStream#you-might-not-need-this-anymore
 
 // When the button is clicked, inject setPageBackgroundColor into current page
 startButton.addEventListener("click", async () => {
