@@ -1,3 +1,5 @@
+import { loadSystem } from "./PoseDetection";
+
 // Initialize button with user's preferred color
 const startButton = document.getElementById("startButton");
 
@@ -18,9 +20,13 @@ startButton.addEventListener("click", async () => {
     if (streamId && streamId.length) {
     }
 
-    chrome.tabs.sendMessage(tab.id, { streamId }, function (response) {
-      // console.log(response.farewell);
-    });
+    setTimeout(() => {
+      console.log("send streamId now...");
+      chrome.tabs.sendMessage(tab.id, { streamId }, function (response) {
+        console.log("sending message with ", { streamId });
+        console.log({ response });
+      });
+    }, 1000);
 
     // const outputVideoEl = document.getElementById("inputSource");
     // if (outputVideoEl) {
@@ -54,6 +60,21 @@ function startCapture() {
         },
       });
       console.log("got stream OK:", mediaStream);
+
+      const body = document.body;
+      const videoElement = document.createElement("video");
+      videoElement.srcObject = mediaStream;
+      videoElement.autoplay = true;
+      videoElement.style.position = "fixed";
+      videoElement.style.top = 0;
+      videoElement.style.left = 0;
+      videoElement.style.visibility = "hidden";
+      videoElement.setAttribute("data-html2canvas-ignore", "true");
+
+      // videoElement.style.
+      body.appendChild(videoElement);
+
+      console.log("appended video element", videoElement);
     } catch (e) {
       console.error("error getting stream:", e);
     }
