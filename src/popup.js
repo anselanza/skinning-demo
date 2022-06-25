@@ -1,18 +1,11 @@
-import { loadSystem } from "./PoseDetection";
+import { dummyLog, loadSystem } from "./PoseDetection";
 
-// Initialize button with user's preferred color
 const startButton = document.getElementById("startButton");
 
-// When the button is clicked, inject setPageBackgroundColor into current page
 startButton.addEventListener("click", async () => {
   console.log("clicked!");
 
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-  chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    function: startCapture,
-  });
 
   chrome.desktopCapture.chooseDesktopMedia(["tab"], tab, async (streamId) => {
     console.log("started desktopCapture OK", streamId);
@@ -20,14 +13,37 @@ startButton.addEventListener("click", async () => {
     if (streamId && streamId.length) {
       console.warn("user cancelled request?");
     }
+    const mediaStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        mandatory: {
+          chromeMediaSource: "desktop",
+          chromeMediaSourceId: streamId,
+        },
+      },
+    });
+    console.log("stream OK:", mediaStream);
 
-    setTimeout(() => {
-      console.log("send streamId now...");
-      chrome.tabs.sendMessage(tab.id, { streamId }, function (response) {
-        console.log("sending message with ", { streamId });
-        console.log({ response });
-      });
-    }, 1000);
+    const inputContainer = document.getElementById("inputContainer");
+
+    const videoElement = document.createElement("video");
+    videoElement.srcObject = mediaStream;
+    videoElement.autoplay = true;
+    videoElement.style.position = "position";
+    videoElement.style.top = 0;
+    videoElement.style.left = 0;
+    videoElement.style.width = "10%";
+    // videoElement.style.visibility = "hidden";
+
+    // inputContainer.setAttribute("data-html2canvas-ignore", "true");
+
+    inputContainer.appendChild(videoElement);
+    console.log("append DOM elements", { videoElement, inputContainer });
+    document.body.appendChild(inputContainer);
+  });
+
+  chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    function: startCapture,
   });
 });
 
@@ -50,11 +66,11 @@ function startCapture() {
       });
       console.log("got stream OK:", mediaStream);
 
-      const outputContainer = document.createElement("div");
-      outputContainer.style.position = "fixed";
-      outputContainer.style.top = 0;
-      outputContainer.style.left = 0;
-      outputContainer.style.border = "1px solid red";
+      // const outputContainer = document.createElement("div");
+      // outputContainer.style.position = "fixed";
+      // outputContainer.style.top = 0;
+      // outputContainer.style.left = 0;
+      // outputContainer.style.border = "1px solid red";
 
       const videoElement = document.createElement("video");
       videoElement.srcObject = mediaStream;
@@ -72,11 +88,11 @@ function startCapture() {
 
       console.log("...DOM appending done");
 
-      try {
-        await loadSystem(outputContainer, videoElement);
-      } catch (poseSystemError) {
-        console.error("error starting pose detection system:", poseSystemError);
-      }
+      // try {
+      //   await loadSystem(outputContainer, videoElement);
+      // } catch (poseSystemError) {
+      //   console.error("error starting pose detection system:", poseSystemError);
+      // }
     } catch (streamError) {
       console.error("error getting stream:", streamError);
     }

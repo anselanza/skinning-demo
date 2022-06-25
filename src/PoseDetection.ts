@@ -7,6 +7,10 @@ import { bonesMatchPose, drawPoseJoints, init, render } from "./Render3D";
 
 const version = mpPose.VERSION || "0.4.1633558788";
 
+export function dummyLog() {
+  console.log("DUMMY!! ***************");
+}
+
 async function createDetector() {
   return posedetection.createDetector(SupportedModels.BlazePose, {
     runtime: "mediapipe",
