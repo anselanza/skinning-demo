@@ -12,7 +12,8 @@ async function createDetector() {
     runtime: "mediapipe",
     // modelType: posedetection.movenet.modelType.MULTIPOSE_LIGHTNING,
     // modelType: "heavy",
-    solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${version}`,
+    // solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${version}`,
+    solutionPath: "/models/blazepose/",
   });
 }
 
