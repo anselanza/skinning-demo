@@ -1,12 +1,11 @@
 import { loadDetector } from "./PoseDetection";
 import { initScene } from "./Render3D";
 
-// Initialize button with user's preferred color
 const startButton = document.getElementById("startButton");
 
 // The key to doing this properly is: https://github.com/wpp/ScreenStream#you-might-not-need-this-anymore
+// Use getDisplayMedia NOT getUserMedia in this context
 
-// When the button is clicked, inject setPageBackgroundColor into current page
 startButton.addEventListener("click", async () => {
   console.log("clicked! ready to get stream...");
 

@@ -1,22 +1,25 @@
-import "@tensorflow/tfjs-backend-webgl";
+import * as tf from "@tensorflow/tfjs-core";
+// import "@tensorflow/tfjs-backend-webgl";
 import * as mpPose from "@mediapipe/pose";
 import * as posedetection from "@tensorflow-models/pose-detection";
 
 import { SupportedModels } from "@tensorflow-models/pose-detection";
 
-const version = mpPose.VERSION || "0.4.1633558788";
+// const version = mpPose.VERSION || "0.4.1633558788";
 
 async function createDetector() {
   return posedetection.createDetector(SupportedModels.BlazePose, {
     runtime: "mediapipe",
     // modelType: posedetection.movenet.modelType.MULTIPOSE_LIGHTNING,
     // modelType: "heavy",
-    solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${version}`,
+    // solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${version}`,
   });
 }
 
 export async function loadDetector() {
   try {
+    // tf.ENV.set("WASM_HAS_SIMD_SUPPORT", false);
+    // tf.ENV.set("WASM_HAS_MULTITHREAD_SUPPORT", false);
     // const skinnedPose = new SkinnedPose(rootElement);
 
     const detector = await createDetector();
