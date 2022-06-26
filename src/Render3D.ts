@@ -7,6 +7,7 @@ import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
+//@ts-ignore
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { Vector3, Object3D, Material, Bone, Quaternion, Matrix4 } from "three";
 import { Keypoint, Pose } from "@tensorflow-models/pose-detection";

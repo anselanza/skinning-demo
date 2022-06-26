@@ -1,0 +1,21 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.app {
+  #inputSource {
+    width: 100vw;
+    z-index: 1;
+    position: absolute;
+  }
+  .render-container {
+    position: absolute;
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+    }
+  }
+}
