@@ -41,7 +41,7 @@ const transformSettings = {
   },
 };
 
-export const init = async (
+export const initScene = async (
   rootElement: HTMLElement
 ): Promise<{ rootObject: THREE.Group; scene: THREE.Scene }> =>
   new Promise((resolve, reject) => {
@@ -169,12 +169,12 @@ const normalisePoint = (
   flipZ = false
 ): Vector3 => {
   const { x, y, z } = kp;
-  return new Vector3(flipX ? -x : x, -y + 0.2, flipZ ? -z : z);
+  return new Vector3(flipX ? -x : x, -y + 0.2, flipZ ? -(z || 0) : z || 0);
 };
 
 export function drawPoseJoints(pose: Pose, rootElement: THREE.Group) {
-  pose.keypoints3D.forEach((kp) => {
-    const radius = remap(kp.score, [0, 1], [0, 0.05]);
+  pose.keypoints3D?.forEach((kp) => {
+    const radius = remap(kp.score || 1, [0, 1], [0, 0.05]);
     const geometry = new THREE.SphereGeometry(radius, 32, 16);
     const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     const sphere = new THREE.Mesh(geometry, material);
@@ -191,28 +191,40 @@ export function drawPoseJoints(pose: Pose, rootElement: THREE.Group) {
 const singleOrInterpolatedJoint = (
   matchingJoint: string | [string, string],
   pose: Pose
-): Keypoint => {
+): Keypoint | null => {
   if (typeof matchingJoint === "string") {
     // Simple match on single corresponding joint...
-    return pose.keypoints3D.find((kp) => kp.name === matchingJoint);
+    if (pose.keypoints3D) {
+      return pose.keypoints3D.find((kp) => kp.name === matchingJoint) || null;
+    } else {
+      return null;
+    }
   } else {
     // Need to interpolate between the two keypoints given...
-    const [p1, p2] = [
-      pose.keypoints3D.find((kp) => kp.name === matchingJoint[0]),
-      pose.keypoints3D.find((kp) => kp.name === matchingJoint[1]),
-    ];
-    const midpoint = new Vector3().lerpVectors(
-      new Vector3(p1.x, p1.y, p1.z),
-      new Vector3(p2.x, p2.y, p2.z),
-      0.5
-    );
-    return {
-      x: midpoint.x,
-      y: midpoint.y,
-      z: midpoint.z,
-      name: `${p1.name}_${p2.name}`,
-      score: (p1.score + p2.score) / 2, // average of scores
-    };
+    if (pose.keypoints3D) {
+      const [p1, p2] = [
+        pose.keypoints3D.find((kp) => kp.name === matchingJoint[0]),
+        pose.keypoints3D.find((kp) => kp.name === matchingJoint[1]),
+      ];
+      if (p1 && p2) {
+        const midpoint = new Vector3().lerpVectors(
+          new Vector3(p1.x, p1.y, p1.z),
+          new Vector3(p2.x, p2.y, p2.z),
+          0.5
+        );
+        return {
+          x: midpoint.x,
+          y: midpoint.y,
+          z: midpoint.z,
+          name: `${p1.name}_${p2.name}`,
+          score: ((p1.score || 1) + (p2.score || 1)) / 2, // average of scores
+        };
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
   }
 };
 

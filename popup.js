@@ -1,4 +1,5 @@
-import { loadSystem } from "./PoseDetection";
+import { loadDetector } from "./PoseDetection";
+import { initScene } from "./Render3D";
 
 // Initialize button with user's preferred color
 const startButton = document.getElementById("startButton");
@@ -18,6 +19,9 @@ startButton.addEventListener("click", async () => {
     const videoElement = document.getElementById("sourceVideo");
     if (videoElement) {
       videoElement.srcObject = stream;
+      const detector = await loadDetector();
+    } else {
+      console.error("could not find videoElement!");
     }
   } catch (e) {
     console.error("could not get stream:", e);
@@ -75,36 +79,23 @@ function startCapture() {
         });
         console.log("got stream OK:", mediaStream);
 
-        // const outputContainer = document.createElement("div");
-        // outputContainer.style.position = "fixed";
-        // outputContainer.style.top = 0;
-        // outputContainer.style.left = 0;
-        // outputContainer.style.border = "1px solid red";
+        const outputContainer = document.createElement("div");
+        outputContainer.style.position = "fixed";
+        outputContainer.style.top = 0;
+        outputContainer.style.left = 0;
+        outputContainer.style.border = "1px solid red";
 
-        // const videoElement = document.createElement("video");
-        // videoElement.srcObject = mediaStream;
-        // videoElement.autoplay = true;
-        // videoElement.style.position = "position";
-        // videoElement.style.top = 0;
-        // videoElement.style.left = 0;
-        // videoElement.style.visibility = "hidden";
+        outputContainer.setAttribute("data-html2canvas-ignore", "true");
 
-        // outputContainer.setAttribute("data-html2canvas-ignore", "true");
+        document.body.appendChild(outputContainer);
 
-        // outputContainer.appendChild(videoElement);
-        // console.log("append DOM elements", { videoElement, outputContainer });
-        // document.body.appendChild(outputContainer);
+        console.log("output container appended to DOM");
 
-        // console.log("...DOM appending done");
-
-        // try {
-        //   await loadSystem(outputContainer, videoElement);
-        // } catch (poseSystemError) {
-        //   console.error(
-        //     "error starting pose detection system:",
-        //     poseSystemError
-        //   );
-        // }
+        try {
+          // const scene = await initScene(outputContainer);
+        } catch (sceneError) {
+          console.error("error initialising 3D scene", sceneError);
+        }
         sendResponse();
       } catch (streamError) {
         console.error("error getting stream:", streamError);
